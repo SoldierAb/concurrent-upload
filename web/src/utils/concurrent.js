@@ -1,6 +1,19 @@
+import PromiseLimit from './promiseLimit'
 
-
+/**
+ * @description 文件分片上传Util
+ * @export
+ * @class Concurrent
+ */
 export default class Concurrent {
+    /**
+     *Creates an instance of Concurrent.
+     * @param {Function returns object Promise} upload
+     * @param {Function returns object Promise} merge
+     * @param {number} [size=1024 * 1024 * 1]
+     * @param {number} [limit=4]
+     * @memberof Concurrent
+     */
     constructor(
         upload,
         merge,
@@ -14,21 +27,22 @@ export default class Concurrent {
             limit,
             file: null,    //当前文件对象
             fileSplit: [],   // 文件分片
-        }
+        };
     }
 
-    /** 
-     * @description state 更新
-    */
+    /**
+     * @param {object} obj
+     * @memberof Concurrent
+     */
     setState(obj) {
         this.state = { ...this.state, ...obj };
     }
 
-    /** 
+    /**
      * @description 文件分片
-     * @param {number} 默认 1M
-     * @returns {blob array}
-    */
+     * @returns {Array}
+     * @memberof Concurrent
+     */
     splitZip() {
         const { file, size } = this.state;
         const fileSplit = [];
@@ -51,24 +65,23 @@ export default class Concurrent {
         return fileSplit;
     }
 
-    /** 
+    /**
     * @description 上传行为；如果 pathList 为  falsy或[] 则上传当前所有分片
-   */
+    * @memberof Concurrent
+    */
     handleUpload = async (pathList) => {
 
         this.splitZip();
 
         let { fileSplit, file, limit } = this.state,
             { name: file_name } = file,
-            fileSequenceItem = [],
-            fileSequence = [],
             fileMark = "";
 
         //文件过滤
         fileSplit = fileSplit.map((blob, index) => {
             fileMark += `${index}` //文件分片标识
-            if ((Array.isArray(pathList) && !pathList.find(pp => pp.split("_index_")[1] === `${index}`)) ||!pathList ) {
-                return { file: blob, index: `${fileMark}_index_${index}` }
+            if ((Array.isArray(pathList) && !pathList.find(pp => pp.split("_file_mark_")[1] === `${index}`)) || !pathList) {
+                return { file: blob, file_mark: `${fileMark}_index_${index}`, file_name }
             } else {
                 return null
             }
@@ -81,47 +94,17 @@ export default class Concurrent {
         }
 
         //2.上传缺失的文件块
-        let fileSequenceLen = fileSplit.length;
+        const promiseLimit = new PromiseLimit(this.limit, fileSplit, this.state.upload)
+        return promiseLimit.excute();
 
-        fileSplit.forEach(file => {
-            fileSequenceItem.push(file);
-            fileSequenceLen -= 1;
-            if (fileSequenceItem.length === limit) {
-                fileSequence.push(fileSequenceItem);
-                fileSequenceItem = [];
-            }
-            if (fileSequenceLen === 0 && fileSequenceItem.length) {
-                fileSequence.push(fileSequenceItem);
-            }
-        })
-
-        await this.fileSequenceUpload(fileSequence, file_name)
-        return this.state.merge.call(this, { file_name })
     }
 
-    /** 
-     * @description 文件分片队列上传
-    */
-    fileSequenceUpload = async (fileSequence, file_name) => {
-        let sequenceLen=fileSequence.length;
-        while (sequenceLen) {
-            const fileSequenceItem = fileSequence.shift();
-            await this.sequenceUpload(fileSequenceItem, file_name)
-            // await new Promise((resolve)=>{
-            //     setTimeout(() => {
-            //         this.sequenceUpload(fileSequenceItem, file_name)
-            //         resolve();
-            //     }, 2000);
-            // })
-            sequenceLen-=1;
-        }
-        return true
-    }
-
-
-    /** 
+    /**
      * @description 分片上传
-    */
+     * @param {Array} fileSequenceItem
+     * @param {String} file_name
+     * @memberof Concurrent
+     */
     sequenceUpload = (fileSequenceItem, file_name) => {
         return Promise.all(
             fileSequenceItem.map(item =>
