@@ -67,7 +67,7 @@ export default class Concurrent {
         //文件过滤
         fileSplit = fileSplit.map((blob, index) => {
             fileMark += `${index}` //文件分片标识
-            if ((Array.isArray(pathList) && pathList.length && !pathList.find(pp => pp.split("_index_")[1] === `${index}`)) || !pathList.length) {
+            if ((Array.isArray(pathList) && !pathList.find(pp => pp.split("_index_")[1] === `${index}`)) ||!pathList ) {
                 return { file: blob, index: `${fileMark}_index_${index}` }
             } else {
                 return null
@@ -107,6 +107,12 @@ export default class Concurrent {
         while (sequenceLen) {
             const fileSequenceItem = fileSequence.shift();
             await this.sequenceUpload(fileSequenceItem, file_name)
+            // await new Promise((resolve)=>{
+            //     setTimeout(() => {
+            //         this.sequenceUpload(fileSequenceItem, file_name)
+            //         resolve();
+            //     }, 2000);
+            // })
             sequenceLen-=1;
         }
         return true
