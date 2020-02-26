@@ -80,7 +80,7 @@ export default class Concurrent {
         //文件过滤
         fileSplit = fileSplit.map((blob, index) => {
             fileMark += `${index}` //文件分片标识
-            if ((Array.isArray(pathList) && !pathList.find(pp => pp.split("_file_mark_")[1] === `${index}`)) || !pathList) {
+            if ((Array.isArray(pathList) && !pathList.find(pp => pp.split("_index_")[1] === `${index}`)) || !pathList) {
                 return { file: blob, file_mark: `${fileMark}_index_${index}`, file_name }
             } else {
                 return null
