@@ -93,10 +93,11 @@ export default class Concurrent {
             return this.state.merge.call(this, { file_name })
         }
 
-        //2.上传缺失的文件块
+        //2.上传缺失的文件块,PROMISE 限流
         const promiseLimit = new PromiseLimit(this.limit, fileSplit, this.state.upload)
-        return promiseLimit.excute();
+        await promiseLimit.excute();
 
+        return this.state.merge.call(this, { file_name })
     }
 
     /**
