@@ -38,7 +38,8 @@ $ yarn start
 ## 上传效果图
 100M+ 文件分片上传--> Promise限流处理完美、 上传200ms内 完成 🚀
 
-![image](https://user-images.githubusercontent.com/33128022/184281365-22a50182-c400-48f1-8d09-db349aa3ac52.png)
+![image](https://user-images.githubusercontent.com/33128022/184282294-ab20b2ff-bdb0-4706-a8cb-7e75f4d40019.png)
+
 
 不分片 大概 700ms+ 👇
 
