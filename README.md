@@ -36,5 +36,13 @@ $ yarn start
 ```
 
 ## 上传效果图
-100M+ 文件上传毫秒级完成
+100M+ 文件分片上传 200ms内 完成 👇
+
 ![image](https://user-images.githubusercontent.com/33128022/184281365-22a50182-c400-48f1-8d09-db349aa3ac52.png)
+
+不分片 大概 700ms+ 👇
+
+<img width="753" alt="image" src="https://user-images.githubusercontent.com/33128022/184282019-c0bd9862-7cbb-4d24-b47e-e401d5fc2ed9.png">
+
+
+```
