@@ -10,10 +10,31 @@
 - 获取文件进行分片
 - 请求服务端过滤出未保存的分片
 - 未保存分片上传 ` Promise限流 `【[PromiseLimit](./web/src/utils/promiseLimit.js) 】 
-
 - 上传完毕，发送合并分片请求
 
 ### 后端接口 
 - 保存分片
 - 已保存的分片info获取
 - 合并分片
+
+## 快速开始
+
+```bash
+# server 初始化
+$ cd server
+$ go mod init file-split
+$ go mod tidy
+
+# 服务启动
+$ go run .
+
+# 前端启动
+$ cd front 
+$ yarn
+$ yarn start
+
+```
+
+## 上传效果图
+100M+ 文件上传毫秒级完成
+![image](https://user-images.githubusercontent.com/33128022/184281365-22a50182-c400-48f1-8d09-db349aa3ac52.png)
